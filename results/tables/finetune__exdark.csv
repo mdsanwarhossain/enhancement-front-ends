@@ -1,0 +1,16 @@
+dataset,protocol,operator,accuracy,n_test,epochs
+exdark,P1_dropin,identity,0.6886715566422168,2454,6
+exdark,P1_dropin,hist_eq,0.6055419722901385,2454,6
+exdark,P1_dropin,clahe,0.6772616136919315,2454,6
+exdark,P1_dropin,gamma,0.46658516707416464,2454,6
+exdark,P1_dropin,ssr,0.6336593317033414,2454,6
+exdark,P1_dropin,msrcr,0.6393643031784841,2454,6
+exdark,P1_dropin,gray_world,0.6882640586797066,2454,6
+exdark,P1_dropin,dcp,0.6866340668296659,2454,6
+exdark,P1_dropin,unsharp,0.6597392013039934,2454,6
+exdark,P1_dropin,zero_dce,0.6711491442542787,2454,6
+exdark,P2_retrained,identity,0.6886715566422168,2454,6
+exdark,P2_retrained,clahe,0.6947840260798696,2454,6
+exdark,P2_retrained,msrcr,0.7171964140179299,2454,6
+exdark,P2_retrained,gamma,0.4531377343113284,2454,6
+exdark,P2_retrained,hist_eq,0.6964140179299103,2454,6

@@ -1,0 +1,15 @@
+component,name,ms_per_image,dim,pretraining,params_m,threads
+operator,identity,5.262700142338872e-05,,,,14
+operator,hist_eq,0.4733996247523464,,,,14
+operator,clahe,1.7342210412607528,,,,14
+operator,gamma,0.3461915427275623,,,,14
+operator,ssr,110.1625050820682,,,,14
+operator,msrcr,391.32794824884814,,,,14
+operator,gray_world,4.315647250526429,,,,14
+operator,dcp,25.73432854114799,,,,14
+operator,unsharp,2.270630165488304,,,,14
+operator,zero_dce,585.1174853766375,,,,14
+encoder,resnet50,45.60588762493959,2048.0,supervised (ImageNet-1k),,14
+encoder,effnet_b0,28.264625541244943,1280.0,supervised (ImageNet-1k),,14
+encoder,dino_s16,51.48171883289857,384.0,"self-supervised (ImageNet-1k, DINO)",,14
+encoder,clip_b16,153.68084637399684,768.0,language-supervised (WIT-400M),,14

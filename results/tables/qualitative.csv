@@ -1,0 +1,2 @@
+dataset,backbone,metric,operators,n_test,n_right_raw,n_broken_by_better_looking,fraction
+exdark,resnet50,uiqm,"identity,clahe,msrcr,ssr",2454,1785,158,0.06438467807660962

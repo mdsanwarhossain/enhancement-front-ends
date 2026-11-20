@@ -1,0 +1,16 @@
+\begin{tabular}{lrlr}
+\toprule
+Operator & ms/image & Encoder & ms/image \\
+\midrule
+none & 0.0 & EfficientNet-B0 & 28.3 \\
+auto gamma & 0.3 & ResNet-50 & 45.6 \\
+hist.\ eq. & 0.5 & DINO ViT-S/16 & 51.5 \\
+CLAHE & 1.7 & CLIP ViT-B/16 & 153.7 \\
+unsharp & 2.3 &  &  \\
+grey-world & 4.3 &  &  \\
+DCP & 25.7 &  &  \\
+SSR & 110.2 &  &  \\
+MSRCR & 391.3 &  &  \\
+Zero-DCE & 585.1 &  &  \\
+\bottomrule
+\end{tabular}

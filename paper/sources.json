@@ -1,0 +1,117 @@
+{
+  "exdark": [
+    "title",
+    "Getting to know low-light images with the Exclusively Dark dataset"
+  ],
+  "hyperkvasir": "10.1038/s41597-020-00622-y",
+  "zerodce": "10.1109/cvpr42600.2020.00185",
+  "dcp": [
+    "title",
+    "Single Image Haze Removal Using Dark Channel Prior"
+  ],
+  "msrcr": [
+    "title",
+    "A multiscale retinex for bridging the gap between color images and the human observation of scenes"
+  ],
+  "clahe": [
+    "title",
+    "Adaptive histogram equalization and its variations"
+  ],
+  "brisque": [
+    "title",
+    "No-Reference Image Quality Assessment in the Spatial Domain"
+  ],
+  "niqe": [
+    "title",
+    "Making a Completely Blind Image Quality Analyzer"
+  ],
+  "uciqe": [
+    "title",
+    "An Underwater Color Image Quality Evaluation Metric"
+  ],
+  "uiqm": [
+    "title",
+    "Human-Visual-System-Inspired Underwater Image Quality Measures"
+  ],
+  "loe": [
+    "title",
+    "Naturalness preserved enhancement algorithm for non-uniform illumination images"
+  ],
+  "colourfulness": [
+    "title",
+    "Measuring colorfulness in natural images"
+  ],
+  "resnet": [
+    "title",
+    "Deep Residual Learning for Image Recognition"
+  ],
+  "dino": [
+    "title",
+    "Emerging Properties in Self-Supervised Vision Transformers"
+  ],
+  "hazeclass": [
+    "title",
+    "Does Haze Removal Help CNN-Based Image Classification?"
+  ],
+  "cdie": [
+    "arxiv",
+    "1710.07558"
+  ],
+  "logme": [
+    "arxiv",
+    "2102.11005"
+  ],
+  "leep": [
+    "arxiv",
+    "2002.12462"
+  ],
+  "knnood": [
+    "arxiv",
+    "2204.06507"
+  ],
+  "ssr": [
+    "title",
+    "Properties and performance of a center/surround retinex"
+  ],
+  "grayworld": [
+    "title",
+    "A spatial processor model for object colour perception"
+  ],
+  "eme": "10.1109/83.918563",
+  "mmd": [
+    "arxiv",
+    "0805.2368"
+  ],
+  "fid": [
+    "arxiv",
+    "1706.08500"
+  ],
+  "mahalanobis": [
+    "arxiv",
+    "1807.03888"
+  ],
+  "covariateshift": [
+    "title",
+    "Improving predictive inference under covariate shift by weighting the log-likelihood function"
+  ],
+  "recog_llie": [
+    "arxiv",
+    "2501.04210"
+  ],
+  "vit": [
+    "arxiv",
+    "2010.11929"
+  ],
+  "twonn": [
+    "title",
+    "Estimating the intrinsic dimension of datasets by a minimal neighborhood information"
+  ],
+  "turbidfish": [
+    "datacite",
+    "10.21227/gd5d-ns10"
+  ],
+  "efficientnet": [
+    "arxiv",
+    "1905.11946"
+  ]
+}
