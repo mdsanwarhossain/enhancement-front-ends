@@ -22,9 +22,22 @@ from analysis.make_tables import (DATASET, ENCODER, OPERATOR, SCORER,  # noqa
 OUT = ROOT / "paper" / "supplementary.tex"
 
 
-def longtable(head, rows, caption, label, align):
+SHORT_DS = {"exdark": "ED", "kvasir": "HK", "turbid_fish": "TF"}
+SHORT_BB = {"resnet50": "R50", "effnet_b0": "EB0", "dino_s16": "ViT"}
+GRID_LEGEND = ("Columns are dataset/encoder: ED ExDark, HK HyperKvasir, "
+               "TF turbid fish; R50 ResNet-50, EB0 EfficientNet-B0, "
+               "ViT DINO ViT-S/16.")
+
+
+def setting_cols(cols):
+    return [f"{SHORT_DS.get(d, d[:2])}/{SHORT_BB.get(b, b[:3])}"
+            for d, b in cols]
+
+
+def longtable(head, rows, caption, label, align, small=False):
     out = [r"\begin{table}[htbp]", rf"\caption{{{caption}}}\label{{{label}}}",
-           r"\centering\footnotesize",
+           r"\centering" + (r"\scriptsize\setlength{\tabcolsep}{3pt}"
+                            if small else r"\footnotesize"),
            rf"\begin{{tabular}}{{{align}}}", r"\toprule",
            " & ".join(head) + r" \\", r"\midrule"]
     out += [" & ".join(r) + r" \\" for r in rows]
@@ -65,14 +78,13 @@ def s_scorer_correlation():
         ["dataset", "backbone"])
     piv = piv.loc[piv.mean(axis=1).sort_values(ascending=False).index]
     cols = list(piv.columns)
-    head = ["Score"] + [f"{DATASET.get(d, d)[:4]}/{ENCODER.get(b, b)}"
-                        for d, b in cols]
+    head = ["Score"] + setting_cols(cols)
     rows = [[SCORER.get(s, s)] + [fmt(piv.loc[s, c], 2) for c in cols]
             for s in piv.index]
     return longtable(head, rows,
                      "Spearman rank correlation with drop-in accuracy, every "
-                     "setting separately.", "tab:s-rho",
-                     "l" + "r" * len(cols))
+                     "setting separately. " + GRID_LEGEND, "tab:s-rho",
+                     "l" + "r" * len(cols), small=True)
 
 
 def s_selection():
@@ -83,15 +95,15 @@ def s_selection():
            * 100).unstack(["dataset", "backbone"])
     piv = piv.loc[piv.mean(axis=1).sort_values().index]
     cols = list(piv.columns)
-    head = ["Chosen by"] + [f"{DATASET.get(d, d)[:4]}/{ENCODER.get(b, b)}"
-                            for d, b in cols]
+    head = ["Chosen by"] + setting_cols(cols)
     rows = [[SCORER.get(s, {"identity": "no enhancement",
                             "best_fixed_p1": "oracle"}.get(s, s))]
             + [fmt(piv.loc[s, c]) for c in cols] for s in piv.index]
     return longtable(head, rows,
                      "Accuracy lost (percentage points) against the best "
-                     "available operator, every setting separately.",
-                     "tab:s-regret", "l" + "r" * len(cols))
+                     "available operator, every setting separately. "
+                     + GRID_LEGEND,
+                     "tab:s-regret", "l" + "r" * len(cols), small=True)
 
 
 def s_leakage():

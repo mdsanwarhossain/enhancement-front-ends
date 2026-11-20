@@ -35,7 +35,7 @@ PRETTY = {"identity": "no enhancement", "hist_eq": "hist-eq", "clahe": "CLAHE",
           "zero_dce": "Zero-DCE"}
 
 
-def main(dataset, backbone, operators, n_rows, seed, metric):
+def main(dataset, backbone, operators, n_rows, seed, metric, rank=0):
     idx = pd.read_csv(ROOT / "data" / "index" / f"{dataset}.csv")
     y = idx.label.to_numpy()
     emb = {op: np.load(ROOT / "data" / "emb" / dataset / backbone / f"{op}.npy")
@@ -62,15 +62,29 @@ def main(dataset, backbone, operators, n_rows, seed, metric):
     if not len(candidates):
         print("no qualifying examples")
         return
-    # prefer the clearest cases: most operators that look better and fail
-    strength = (wrong[:, 1:] & better_looking[:, 1:]).sum(axis=1)[candidates]
-    order = candidates[np.argsort(-strength)]
-    rng = np.random.default_rng(seed)
-    top = order[:max(n_rows * 4, n_rows)]
-    pick = rng.choice(top, min(n_rows, len(top)), replace=False)
+    # Prefer the unambiguous case - every operator shown scores higher than the
+    # raw frame and every one of them breaks the classifier - so the figure
+    # cannot be read as cherry-picking one bad operator out of several.
+    unambiguous = np.flatnonzero(
+        right & (wrong[:, 1:] & better_looking[:, 1:]).all(axis=1))
+    pool = unambiguous if len(unambiguous) >= n_rows else candidates
+    strength = (wrong[:, 1:] & better_looking[:, 1:]).sum(axis=1)[pool]
+    # Deterministic: strongest cases first, ties in dataset order, and --rank
+    # chooses among them. Every one of them qualifies on the same criterion;
+    # the choice between them is presentational, so it is reproducible rather
+    # than drawn at random.
+    order = pool[np.argsort(-strength, kind="stable")]
+    pick = order[rank:rank + n_rows]
+    if not len(pick):
+        print(f"rank {rank} is past the end of {len(order)} qualifying cases")
+        return
+    print(f"  {len(unambiguous)} of {len(te)} test images are broken by every "
+          f"operator shown while all of them score higher on {metric}; "
+          f"showing rank {rank} of {len(order)}")
 
+    # tight: this figure has to earn its space inside a ten-page limit
     fig, axes = plt.subplots(len(pick), len(operators),
-                             figsize=(2.0 * len(operators), 2.15 * len(pick)))
+                             figsize=(1.95 * len(operators), 1.55 * len(pick)))
     axes = np.atleast_2d(axes)
     for r, i in enumerate(pick):
         img = cv2.imread(idx.path.iloc[te[i]], cv2.IMREAD_COLOR)
@@ -90,8 +104,8 @@ def main(dataset, backbone, operators, n_rows, seed, metric):
             if r == 0:
                 ax.set_title(PRETTY.get(op, op), fontsize=8)
         axes[r, 0].set_ylabel(f"true: {y[te][i]}", fontsize=7)
-    fig.suptitle("Green border: the deployed probe is right. "
-                 "Orange: it is wrong after enhancement.", fontsize=8, y=1.0)
+    # the legend lives in the LaTeX caption, where it costs no vertical space
+    fig.subplots_adjust(hspace=0.34, wspace=0.04)
     FIG.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
         fig.savefig(FIG / f"fig_qualitative.{ext}")
@@ -116,6 +130,8 @@ if __name__ == "__main__":
     ap.add_argument("--rows", type=int, default=3)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--metric", default="uiqm")
+    ap.add_argument("--rank", type=int, default=0,
+                    help="which qualifying example to show")
     a = ap.parse_args()
     main(a.dataset, a.backbone, a.operators.split(","), a.rows, a.seed,
-         a.metric)
+         a.metric, a.rank)

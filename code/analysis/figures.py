@@ -41,7 +41,7 @@ OPERATOR = {"identity": "none", "hist_eq": "hist-eq", "clahe": "CLAHE",
             "gray_world": "grey-world", "dcp": "DCP", "unsharp": "unsharp",
             "zero_dce": "Zero-DCE"}
 SCORER = {
-    "esp_mmd": "ESP (MMD)", "esp_frechet": "ESP (Frechet)",
+    "esp_mmd": "ESP (MMD)", "esp_frechet": "ESP (Fr\u00e9chet)",
     "esp_centroid": "ESP (centroid)", "esp_knn": "ESP (kNN)",
     "esp_mahalanobis": "ESP (Mahalanobis)",
     "geo_consensus": "neighbourhood consensus", "geo_hubness": "hubness",
@@ -81,7 +81,7 @@ def fig_protocol_gap():
     if df.empty:
         return
     dss = datasets_in(df)
-    fig, axes = plt.subplots(1, len(dss), figsize=(2.7 * len(dss), 2.7))
+    fig, axes = plt.subplots(1, len(dss), figsize=(3.1 * len(dss), 2.30))
     axes = np.atleast_1d(axes)
     for ax, ds in zip(axes, dss):
         d = df[df.dataset == ds]
@@ -114,11 +114,19 @@ def fig_protocol_gap():
 
 
 # ---------------------------------------------------------------- figure 2 ---
-def fig_scorer_ranking():
+MAIN_SCORERS = ["esp_frechet", "esp_mmd", "esp_centroid", "geo_consensus",
+                "iqa_ssim_in", "iqa_psnr_in", "iqa_brisque", "iqa_entropy",
+                "iqa_uciqe", "iqa_uiqm", "iqa_eme", "iqa_rms_contrast",
+                "iqa_niqe", "iqa_sharpness"]
+
+
+def fig_scorer_ranking(subset=None, name="fig_scorer_ranking"):
     """Which label-free score ranks operators the way accuracy does?"""
     df = read("operator_scores__*.csv")
     if df.empty:
         return
+    if subset:
+        df = df[df.scorer.isin(subset)]
     per = (df.groupby(["scorer", "dataset", "backbone", "fold"])
            .apply(lambda g: spearmanr(g.value, g.p1_accuracy).statistic,
                   include_groups=False).rename("rho").reset_index())
@@ -136,7 +144,7 @@ def fig_scorer_ranking():
     handles = [plt.Rectangle((0, 0), 1, 1, color=colour[k]) for k in colour]
     ax.legend(handles, ["embedding shift (ours)", "embedding geometry",
                         "pixel quality"], frameon=False, loc="lower right")
-    save(fig, "fig_scorer_ranking")
+    save(fig, name)
 
 
 # ---------------------------------------------------------------- figure 3 ---
@@ -282,9 +290,13 @@ def fig_beyond_linear_probe():
 
 if __name__ == "__main__":
     FIG.mkdir(parents=True, exist_ok=True)
-    for fn in (fig_protocol_gap, fig_scorer_ranking, fig_shift_vs_accuracy,
-               fig_severity, fig_selection_regret, fig_beyond_linear_probe):
+    jobs = [fig_protocol_gap, fig_scorer_ranking,
+            lambda: fig_scorer_ranking(MAIN_SCORERS, "fig_scorer_ranking_main"),
+            fig_shift_vs_accuracy, fig_severity, fig_selection_regret,
+            fig_beyond_linear_probe]
+    for fn in jobs:
         try:
             fn()
         except Exception as exc:
-            print(f"  [skip] {fn.__name__}: {type(exc).__name__}: {exc}")
+            print(f"  [skip] {getattr(fn, '__name__', fn)}: "
+                  f"{type(exc).__name__}: {exc}")

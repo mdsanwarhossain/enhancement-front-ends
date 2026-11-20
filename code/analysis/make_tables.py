@@ -36,7 +36,7 @@ SCORER = {
     "geo_consensus": "neighbourhood consensus", "geo_hubness": "hubness",
     "geo_mutual_knn": "mutual $k$NN rate",
     "geo_effective_rank": "effective rank", "geo_twonn_dim": "intrinsic dim.",
-    "geo_taq": "embedding geometry (combined)",
+    "geo_taq": "embedding geometry",
     "iqa_brisque": "BRISQUE", "iqa_niqe": "NIQE",
     "iqa_entropy": "entropy", "iqa_rms_contrast": "RMS contrast",
     "iqa_colourfulness": "colourfulness", "iqa_sharpness": "sharpness",

@@ -13,10 +13,7 @@
     "title",
     "A multiscale retinex for bridging the gap between color images and the human observation of scenes"
   ],
-  "clahe": [
-    "title",
-    "Adaptive histogram equalization and its variations"
-  ],
+  "clahe": "10.1016/S0734-189X(87)80186-X",
   "brisque": [
     "title",
     "No-Reference Image Quality Assessment in the Spatial Domain"
@@ -53,10 +50,7 @@
     "title",
     "Does Haze Removal Help CNN-Based Image Classification?"
   ],
-  "cdie": [
-    "arxiv",
-    "1710.07558"
-  ],
+  "cdie": "10.1109/cvpr.2018.00424",
   "logme": [
     "arxiv",
     "2102.11005"
@@ -94,10 +88,7 @@
     "title",
     "Improving predictive inference under covariate shift by weighting the log-likelihood function"
   ],
-  "recog_llie": [
-    "arxiv",
-    "2501.04210"
-  ],
+  "recog_llie": "10.5220/0013316800003912",
   "twonn": [
     "title",
     "Estimating the intrinsic dimension of datasets by a minimal neighborhood information"

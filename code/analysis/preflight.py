@@ -99,7 +99,21 @@ def main() -> int:
                       subprocess.run(["pdfinfo", str(main_pdf)],
                                      capture_output=True, text=True).stdout)
     if pages:
-        notes.append(f"manuscript is {pages.group(1)} pages")
+        n_pages = int(pages.group(1))
+        notes.append(f"manuscript is {n_pages} pages")
+        # SIViP: "no longer than 10 pages in the final, two column format of
+        # the journal, including all text, figures, and references, and the
+        # 10th page may contain only references."
+        check(n_pages <= 10,
+              f"manuscript is {n_pages} pages; the journal allows 10")
+        if n_pages == 10:
+            last = subprocess.run(
+                ["pdftotext", "-f", "10", "-l", "10", str(main_pdf), "-"],
+                capture_output=True, text=True).stdout
+            check("References" in text and
+                  not any(h in last for h in ("Discussion", "Conclusion",
+                                              "Statements and declarations")),
+                  "page 10 carries body text; it may contain only references")
     abstract = re.search(r"Abstract\s+(.*?)\s*Keywords", text, re.S)
     if abstract:
         n = len(abstract.group(1).split())

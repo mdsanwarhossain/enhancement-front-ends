@@ -172,7 +172,11 @@ def main():
         iqa = mean_rho[mean_rho.index.str.startswith("iqa_")]
         geo = mean_rho[mean_rho.index.str.startswith("geo_")]
         N.num("espRhoBest", esp.max())
-        N.word("espBestName", esp.idxmax().replace("esp_", "").upper())
+        esp_name = {"esp_frechet": "Fr\u00e9chet distance",
+                    "esp_mmd": "maximum mean discrepancy",
+                    "esp_centroid": "centroid shift"}
+        N.word("espBestName", esp_name.get(esp.idxmax(),
+                                           esp.idxmax().replace("esp_", "")))
         N.num("espRhoMmd", mean_rho.get("esp_mmd", np.nan))
         N.num("geoRhoBest", geo.max() if len(geo) else np.nan)
         if len(iqa):
@@ -193,6 +197,9 @@ def main():
             N.num("nNoRefTotal", len(nr), "{:d}")
             N.num("nInputRefTotal", len(iqa) - len(nr), "{:d}")
             N.num("nPixelMetrics", len(iqa), "{:d}")
+            # the main figure shows a selection; the caption says how many
+            # the supplementary table carries
+            N.num("nScorersTotal", int(mean_rho.size), "{:d}")
             heavy = img[img.scorer.isin(["iqa_brisque", "iqa_niqe"])]
             if len(heavy):
                 # images behind the smallest per-operator mean of a heavy metric
@@ -222,7 +229,13 @@ def main():
 
     # ---- 4. choosing an operator without labels --------------------------
     if not sel.empty:
-        for name, key in (("Esp", "esp_mmd"), ("Identity", "identity"),
+        esp_by = (sel[sel.scorer.str.startswith("esp_")]
+                  .groupby("scorer").p1_regret.mean())
+        # select with the same estimator the ranking result reports, not a
+        # different one that happens to look better
+        esp_key = "esp_frechet" if "esp_frechet" in esp_by.index \
+            else esp_by.idxmin()
+        for name, key in (("Esp", esp_key), ("Identity", "identity"),
                           ("Oracle", "best_fixed_p1")):
             r = sel[sel.scorer == key].p1_regret
             N.pp(f"regret{name}", float(r.mean()) if len(r) else None)
@@ -233,7 +246,17 @@ def main():
             N.pp("regretIqaWorst", by.max())
             N.word("regretIqaWorstName",
                    PRETTY_SCORE.get(by.idxmax(), by.idxmax()))
-        esp_pick = sel[sel.scorer == "esp_mmd"]
+            # The input-referenced metrics are degenerate as selectors: their
+            # distance to the input is zero for the identity, so they always
+            # choose no enhancement and inherit its regret. The honest
+            # comparison is against the no-reference metrics, which is what
+            # enhancement practice actually uses.
+            nr = by.drop([c for c in ("iqa_psnr_in", "iqa_ssim_in",
+                                      "iqa_ambe", "iqa_loe") if c in by.index])
+            N.pp("regretNoRefBest", nr.min())
+            N.word("regretNoRefBestName",
+                   PRETTY_SCORE.get(nr.idxmin(), nr.idxmin()))
+        esp_pick = sel[sel.scorer == esp_key]
         if len(esp_pick):
             N.num("espPicksIdentity",
                   int((esp_pick.picked == "identity").sum()), "{:d}")
@@ -351,10 +374,30 @@ def main():
         N.pp("sensIdentity", float(sens.identity.iloc[0]))
         N.pp("sensBest", float(sens.accuracy.max()))
         N.pp("sensWorst", float(sens.accuracy.min()))
-        N.word("sensWorstName", sens.loc[sens.accuracy.idxmin(), "variant"]
-               .replace("_", " "))
-        N.word("sensBestName", sens.loc[sens.accuracy.idxmax(), "variant"]
-               .replace("_", " "))
+        # the sweep's variant ids read as jargon in running text; the
+        # settings are the ones code/experiments/sensitivity.py applies
+        SWEEP = {
+            "clahe_clip1": "CLAHE at clip limit 1.0",
+            "clahe_clip2": "CLAHE at clip limit 2.0",
+            "clahe_clip4": "CLAHE at clip limit 4.0",
+            "clahe_grid4": "CLAHE on a 4x4 tile grid",
+            "clahe_grid16": "CLAHE on a 16x16 tile grid",
+            "ssr_s30": "single-scale Retinex at scale 30",
+            "ssr_s80": "single-scale Retinex at scale 80",
+            "ssr_s200": "single-scale Retinex at scale 200",
+            "unsharp_a05": "unsharp masking at amount 0.5",
+            "unsharp_a15": "unsharp masking at amount 1.5",
+            "unsharp_a30": "unsharp masking at amount 3.0",
+            "dcp_w07": "dark channel prior at $\\omega=0.7$",
+            "dcp_w095": "dark channel prior at $\\omega=0.95$",
+        }
+
+        def _variant(v):
+            return SWEEP.get(v, v.replace("_", " "))
+        N.word("sensWorstName", _variant(sens.loc[sens.accuracy.idxmin(),
+                                                  "variant"]))
+        N.word("sensBestName", _variant(sens.loc[sens.accuracy.idxmax(),
+                                                 "variant"]))
         N.pp("sensBestGap", -float(sens.delta.max()))
         N.pp("sensWorstGap", -float(sens.delta.min()))
 
