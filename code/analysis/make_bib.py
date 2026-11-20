@@ -96,8 +96,10 @@ def arxiv(arxiv_id: str):
         return None
     return {"title": [tag("title")], "author": [{"literal": a} for a in authors],
             "issued": {"date-parts": [[int(tag("published")[:4] or 0)]]},
+            # the DOI already identifies the preprint; repeating the arXiv
+            # number in the venue field only lengthens the entry
             "type": "posted-content", "DOI": f"10.48550/arXiv.{arxiv_id}",
-            "container-title": [f"arXiv:{arxiv_id}"]}
+            "container-title": [""]}
 
 
 def _authors(item) -> str:
